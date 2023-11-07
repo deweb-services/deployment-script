@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/deweb-services/deployment-script/internal/types"
@@ -16,13 +15,11 @@ import (
 )
 
 type DWSClient struct {
-	Config          *types.DWSProviderConfiguration
-	transactionNote string
-	client          *http.Client
-	signer          *Signer
-	url             string
-	s3client        *s3.Client
-	log             *zap.SugaredLogger
+	Config *types.DWSProviderConfiguration
+	client *http.Client
+	signer *Signer
+	url    string
+	log    *zap.SugaredLogger
 }
 
 type ClientOpt func(c *DWSClient)
