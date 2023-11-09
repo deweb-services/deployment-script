@@ -72,7 +72,7 @@ func init() {
 	_ = viper.BindPFlag("secret_key", rootCmd.PersistentFlags().Lookup("secret_key"))
 
 	gpuCreateCmd.Flags().StringVar(&gpuCreateCfg.GPUName, "name", "name", "gpu name like 'RTX_2080'")
-	gpuCreateCmd.Flags().StringVar(&gpuCreateCfg.Image, "image", "image", "image to deploy, like image:version")
+	gpuCreateCmd.Flags().StringVar(&gpuCreateCfg.Image, "image", "ubuntu:latest", "image to deploy, like image:version")
 	gpuCreateCmd.Flags().StringVar(&gpuCreateCfg.SSHKey, "ssh_key", "ssh_key", "ssh key to connect to instance")
 	gpuCreateCmd.Flags().Int64Var(&gpuCreateCfg.GPUCount, "count", 1, "count of gpus to deploy")
 	gpuCreateCmd.Flags().StringVar(&gpuCreateCfg.Region, "region", "Europe", "region to deploy instance")
