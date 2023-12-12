@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/deweb-services/deployment-script/internal/dws"
 	"github.com/deweb-services/deployment-script/internal/types"
 	"github.com/deweb-services/deployment-script/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (
@@ -52,6 +54,7 @@ var (
 			if err != nil {
 				return fmt.Errorf("create gpu error: %w", err)
 			}
+			time.Sleep(time.Second * 60)
 			respGet, err := cli.GetGPU(cmd.Context(), respCreate.UUID)
 			if err != nil {
 				return fmt.Errorf("get gpu error: %w", err)
