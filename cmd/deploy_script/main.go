@@ -36,7 +36,7 @@ var (
 			} else {
 				log.Errorf("delete gpu instance with uuid %s, error: %v", gpuDeleteCfg.UUID, err)
 			}
-			res := fmt.Sprintf("success=%t", success)
+			res := fmt.Sprintf("success=%t\n", success)
 			_ = os.WriteFile("result", []byte(res), 0644)
 			log.Debug(res)
 		},
