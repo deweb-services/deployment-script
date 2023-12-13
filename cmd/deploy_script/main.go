@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/deweb-services/deployment-script/internal/dws"
@@ -10,6 +11,11 @@ import (
 	"github.com/deweb-services/deployment-script/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+const (
+	maxTries  = 240
+	sleepTime = 5 * time.Second
 )
 
 var (
@@ -29,7 +35,7 @@ var (
 	gpuDeleteCmd = &cobra.Command{
 		Use:   "delete",
 		Short: "delete gpu instance",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			success := false
 			log.Debugf("delete gpu instance with uuid %s", gpuDeleteCfg.UUID)
 			cli := dws.NewClient(cmd.Context(), &clientCfg, log, dws.ClientOptWithURL(types.APIURL))
@@ -37,10 +43,12 @@ var (
 				success = true
 			} else {
 				log.Errorf("delete gpu instance with uuid %s, error: %v", gpuDeleteCfg.UUID, err)
+				return err
 			}
 			res := fmt.Sprintf("success=%t\n", success)
 			_ = os.WriteFile("result", []byte(res), 0644)
 			log.Debug(res)
+			return nil
 		},
 	}
 
@@ -55,12 +63,30 @@ var (
 				return fmt.Errorf("create gpu error: %w", err)
 			}
 			time.Sleep(time.Second * 60)
-			respGet, err := cli.GetGPU(cmd.Context(), respCreate.UUID)
-			if err != nil {
-				return fmt.Errorf("get gpu error: %w", err)
+			respGet := &types.RentedGpuInfoResponse{}
+		Loop:
+			for i := 0; i < maxTries; i++ {
+				respGet, err = cli.GetGPU(cmd.Context(), respCreate.UUID)
+				if err == nil {
+					switch strings.ToLower(respGet.ActualStatus) {
+					case "running":
+						break Loop
+					case "destroying", "exited":
+						err = fmt.Errorf("failed to create gpu")
+						break Loop
+					default:
+						log.Debugf("get gpu instance status: %s", respGet.ActualStatus)
+					}
+				}
+				time.Sleep(sleepTime)
 			}
+			// write uuid to file anyway
 			res := fmt.Sprintf("uuid=%s\nhost=%s\nport=%d\n", respCreate.UUID, respGet.SshHost, respGet.SshPort)
 			_ = os.WriteFile("result", []byte(res), 0644)
+			// then check the error
+			if err != nil {
+				return fmt.Errorf("get created gpu parameters error: %s", err)
+			}
 			return nil
 		},
 	}
@@ -98,5 +124,9 @@ func initConfig() {
 }
 
 func main() {
-	_ = rootCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil {
+		log.Errorf("command exited with error: %s", err)
+		os.Exit(1)
+	}
 }
