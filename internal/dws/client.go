@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/deweb-services/deployment-script/internal/types"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
-	"time"
 )
 
 type DWSClient struct {

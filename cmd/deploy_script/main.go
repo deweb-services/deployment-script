@@ -62,7 +62,7 @@ var (
 			if err != nil {
 				return fmt.Errorf("create gpu error: %w", err)
 			}
-			time.Sleep(time.Second * 60)
+			time.Sleep(time.Second * 30)
 			respGet := &types.RentedGpuInfoResponse{}
 		Loop:
 			for i := 0; i < maxTries; i++ {
