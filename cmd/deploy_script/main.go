@@ -39,15 +39,18 @@ var (
 			success := false
 			log.Debugf("delete gpu instance with uuid %s", gpuDeleteCfg.UUID)
 			cli := dws.NewClient(cmd.Context(), &clientCfg, log, dws.ClientOptWithURL(types.APIURL))
-			if err := cli.DeleteGPU(cmd.Context(), gpuDeleteCfg.UUID); err == nil {
+			err := cli.DeleteGPU(cmd.Context(), gpuDeleteCfg.UUID)
+			if err == nil {
 				success = true
-			} else {
-				log.Errorf("delete gpu instance with uuid %s, error: %v", gpuDeleteCfg.UUID, err)
-				return err
 			}
 			res := fmt.Sprintf("success=%t\n", success)
 			_ = os.WriteFile("result", []byte(res), 0644)
 			log.Debug(res)
+
+			if err != nil {
+				log.Errorf("delete gpu instance with uuid %s, error: %v", gpuDeleteCfg.UUID, err)
+				return err
+			}
 			return nil
 		},
 	}
@@ -128,7 +131,7 @@ func initConfig() {
 func main() {
 	err := rootCmd.Execute()
 	if err != nil {
-		log.Errorf("command exited with error: %s", err)
+		log.Fatalf("command exited with error: %s", err)
 		os.Exit(1)
 	}
 }
