@@ -77,6 +77,8 @@ var (
 					default:
 						log.Debugf("get gpu instance status: %s", respGet.ActualStatus)
 					}
+				} else {
+					log.Debugf("get gpu error: %s", err)
 				}
 				time.Sleep(sleepTime)
 			}
