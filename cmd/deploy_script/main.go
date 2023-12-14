@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	maxTries  = 240
-	sleepTime = 5 * time.Second
+	maxTries  = 100
+	sleepTime = 10 * time.Second
 )
 
 var (
