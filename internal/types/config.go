@@ -36,7 +36,7 @@ type RentedGpuInfoResponse struct {
 	BwNvlink          int64    `json:"bw_nvlink"`
 	ComputeCap        int64    `json:"compute_cap"`
 	CpuCores          int64    `json:"cpu_cores"`
-	CpuCoresEffective int64    `json:"cpu_cores_effective"`
+	CpuCoresEffective float64  `json:"cpu_cores_effective"`
 	CpuName           string   `json:"cpu_name"`
 	CpuRam            int64    `json:"cpu_ram"`
 	CudaMaxGood       float64  `json:"cuda_max_good"`
