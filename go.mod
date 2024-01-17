@@ -3,14 +3,14 @@ module github.com/deweb-services/deployment-script
 go 1.21.3
 
 require (
-	github.com/aws/aws-sdk-go v1.46.6
-	github.com/deweb-services/terraform-provider-dws v0.0.6
+	github.com/deweb-services/terraform-provider-dws v0.0.8
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
 	go.uber.org/zap v1.26.0
 )
 
 require (
+	github.com/aws/aws-sdk-go v1.46.6 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.21.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.42 // indirect

@@ -27,8 +27,8 @@ func init() {
 	cobra.OnInitialize(func() {
 		viper.AutomaticEnv()
 	})
-	rootCmd.PersistentFlags().StringVar(&clientCfg.AccessKey, "access_key", "access_key", "access key for dws platform")
-	rootCmd.PersistentFlags().StringVar(&clientCfg.SecretAccessKey, "secret_key", "secret_key", "secret key for dws platform")
+	rootCmd.PersistentFlags().StringVar(&clientCfg.AccessKey, "access_key", "access_key", "access key for nodeshift platform")
+	rootCmd.PersistentFlags().StringVar(&clientCfg.SecretAccessKey, "secret_key", "secret_key", "secret key for nodeshift platform")
 
 	_ = viper.BindPFlag("access_key", rootCmd.PersistentFlags().Lookup("access_key"))
 	_ = viper.BindPFlag("secret_key", rootCmd.PersistentFlags().Lookup("secret_key"))
@@ -50,8 +50,8 @@ func init() {
 	gpuCmd.AddCommand(gpuDeleteCmd)
 
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.Region, "region", "region", "Region where you want to deploy like 'USA'")
-	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.ImageVersion, "image", "Ubuntu-v22.04", "OS Image used to install on the target Vitrual Machine Deployment like 'Ubuntu-v22.04'")
-	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.CPU, "cpu", 1, "number of CPU cores for your deployment")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.ImageVersion, "image", "Ubuntu-v22.04", "OS Image to be installed on the target Virtual Machine Deployment like 'Ubuntu-v22.04'")
+	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.CPU, "cpu", 1, "Number of CPU cores for your deployment")
 	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.RAM, "ram", 1, "Amount of RAM for your Deployment in GB")
 	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.Hdd, "disk_size", 10, "Disk size for your Deployment in GB")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.HddType, "disk_type", "hdd", "Disk type for your Deployment. Available options: hdd, ssd")
