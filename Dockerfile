@@ -10,7 +10,7 @@ RUN go build -v -ldflags="-X 'main.version=$VERSION'" -o /tmp/deploy_script ./cm
 
 FROM alpine:3.18
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates bash
 RUN update-ca-certificates
 
 ARG SERVER_CERT_PATH

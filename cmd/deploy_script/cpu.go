@@ -51,7 +51,7 @@ var (
 				log.Debugf("get cpu error: %s", err)
 				return err
 			}
-			res := fmt.Sprintf("id=%s\n", resp.ID)
+			res := fmt.Sprintf("uuid=%s\n", resp.ID)
 			if resp.Data != nil {
 				res += fmt.Sprintf("ip=%s\nipv6=%s\nygg=%s\n", resp.Data.IP, resp.Data.IPv6, resp.Data.Ygg)
 			}
