@@ -1,13 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/deweb-services/deployment-script/internal/dws"
-	"github.com/deweb-services/deployment-script/internal/types"
 	"github.com/deweb-services/deployment-script/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,89 +12,21 @@ import (
 const (
 	maxTries  = 100
 	sleepTime = 10 * time.Second
+	APIURL    = "https://app.nodeshift.com"
 )
 
 var (
-	clientCfg    types.DWSProviderConfiguration
-	gpuCreateCfg types.GPUCreateConfig
-	gpuDeleteCfg types.GPUDeleteConfig
-	log          = logger.Logger().Sugar().Named("deployment-script")
-	rootCmd      = &cobra.Command{
+	log     = logger.Logger().Sugar().Named("deployment-script")
+	rootCmd = &cobra.Command{
 		Use:   "deploy",
 		Short: "deploy instance",
-	}
-
-	gpuCmd = &cobra.Command{
-		Use:   "gpu",
-		Short: "deploy GPU instance",
-	}
-	gpuDeleteCmd = &cobra.Command{
-		Use:   "delete",
-		Short: "delete gpu instance",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			success := false
-			log.Debugf("delete gpu instance with uuid %s", gpuDeleteCfg.UUID)
-			cli := dws.NewClient(cmd.Context(), &clientCfg, log, dws.ClientOptWithURL(types.APIURL))
-			err := cli.DeleteGPU(cmd.Context(), gpuDeleteCfg.UUID)
-			if err == nil {
-				success = true
-			}
-			res := fmt.Sprintf("success=%t\n", success)
-			_ = os.WriteFile("result", []byte(res), 0644)
-			log.Debug(res)
-
-			if err != nil {
-				log.Errorf("delete gpu instance with uuid %s, error: %v", gpuDeleteCfg.UUID, err)
-				return err
-			}
-			return nil
-		},
-	}
-
-	gpuCreateCmd = &cobra.Command{
-		Use:   "create",
-		Short: "create gpu instance",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Debugf("create gpu instance with config %v", gpuCreateCfg)
-			cli := dws.NewClient(cmd.Context(), &clientCfg, log, dws.ClientOptWithURL(types.APIURL))
-			respCreate, err := cli.CreateGPU(cmd.Context(), &gpuCreateCfg)
-			if err != nil {
-				return fmt.Errorf("create gpu error: %w", err)
-			}
-			time.Sleep(time.Second * 30)
-			respGet := &types.RentedGpuInfoResponse{}
-		Loop:
-			for i := 0; i < maxTries; i++ {
-				respGet, err = cli.GetGPU(cmd.Context(), respCreate.UUID)
-				if err == nil {
-					switch strings.ToLower(respGet.ActualStatus) {
-					case "running":
-						break Loop
-					case "destroying", "exited":
-						err = fmt.Errorf("failed to create gpu")
-						break Loop
-					default:
-						log.Debugf("get gpu instance status: %s", respGet.ActualStatus)
-					}
-				} else {
-					log.Debugf("get gpu error: %s", err)
-				}
-				time.Sleep(sleepTime)
-			}
-			// write uuid to file anyway
-			res := fmt.Sprintf("uuid=%s\nhost=%s\nport=%d\n", respCreate.UUID, respGet.SshHost, respGet.SshPort)
-			_ = os.WriteFile("result", []byte(res), 0644)
-			// then check the error
-			if err != nil {
-				return fmt.Errorf("get created gpu parameters error: %s", err)
-			}
-			return nil
-		},
 	}
 )
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(func() {
+		viper.AutomaticEnv()
+	})
 	rootCmd.PersistentFlags().StringVar(&clientCfg.AccessKey, "access_key", "access_key", "access key for dws platform")
 	rootCmd.PersistentFlags().StringVar(&clientCfg.SecretAccessKey, "secret_key", "secret_key", "secret key for dws platform")
 
@@ -117,15 +45,42 @@ func init() {
 	_ = viper.BindPFlag("region", rootCmd.Flags().Lookup("region"))
 	gpuCmd.AddCommand(gpuCreateCmd)
 
-	gpuDeleteCmd.Flags().StringVar(&gpuDeleteCfg.UUID, "uuid", "uuid", "uuid of deployment to delete")
+	gpuDeleteCmd.Flags().StringVar(&gpuDeleteCfg, "uuid", "uuid", "uuid of deployment to delete")
 	_ = viper.BindPFlag("uuid", rootCmd.Flags().Lookup("uuid"))
 
 	gpuCmd.AddCommand(gpuDeleteCmd)
-	rootCmd.AddCommand(gpuCmd)
-}
 
-func initConfig() {
-	viper.AutomaticEnv()
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.Region, "region", "region", "Region where you want to deploy like 'USA'")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.ImageVersion, "image", "Ubuntu-v22.04", "OS Image used to install on the target Vitrual Machine Deployment like 'Ubuntu-v22.04'")
+	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.CPU, "cpu", 1, "number of CPU cores for your deployment")
+	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.RAM, "ram", 1, "Amount of RAM for your Deployment in GB")
+	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.Hdd, "disk_size", 10, "Disk size for your Deployment in GB")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.HddType, "disk_type", "hdd", "Disk type for your Deployment. Available options: hdd, ssd")
+	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ipv4, "assign_public_ipv4", false, "If true assigns a public ipv4 address for your Deployment")
+	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ipv4, "assign_public_ipv6", false, "If true assigns a public ipv6 address for your Deployment")
+	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ygg, "assign_ygg_ip", false, "If true assigns a yggdrasil address for your Deployment")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.NetworkUUID, "vpc_id", "", "ID of the vpc to deploy your VM into")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.SSHKey, "ssh_key", "", "SSH key to add to the target VM to make it possible to connect to your VM")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.HostName, "host_name", "", "Host name for your Deployment")
+	_ = viper.BindPFlag("region", rootCmd.Flags().Lookup("region"))
+	_ = viper.BindPFlag("image", rootCmd.Flags().Lookup("image"))
+	_ = viper.BindPFlag("cpu", rootCmd.Flags().Lookup("cpu"))
+	_ = viper.BindPFlag("ram", rootCmd.Flags().Lookup("ram"))
+	_ = viper.BindPFlag("disk_size", rootCmd.Flags().Lookup("disk_size"))
+	_ = viper.BindPFlag("disk_type", rootCmd.Flags().Lookup("disk_type"))
+	_ = viper.BindPFlag("assign_public_ipv4", rootCmd.Flags().Lookup("assign_public_ipv4"))
+	_ = viper.BindPFlag("assign_public_ipv6", rootCmd.Flags().Lookup("assign_public_ipv6"))
+	_ = viper.BindPFlag("assign_ygg_ip", rootCmd.Flags().Lookup("assign_ygg_ip"))
+	_ = viper.BindPFlag("vpc_id", rootCmd.Flags().Lookup("vpc_id"))
+	_ = viper.BindPFlag("ssh_key", rootCmd.Flags().Lookup("ssh_key"))
+	_ = viper.BindPFlag("host_name", rootCmd.Flags().Lookup("host_name"))
+	cpuCmd.AddCommand(cpuCreateCmd)
+
+	cpuDeleteCmd.Flags().StringVar(&cpuDeleteCfg, "uuid", "uuid", "uuid of deployment to delete")
+	_ = viper.BindPFlag("uuid", rootCmd.Flags().Lookup("uuid"))
+	cpuCmd.AddCommand(cpuDeleteCmd)
+
+	rootCmd.AddCommand(cpuCmd)
 }
 
 func main() {
