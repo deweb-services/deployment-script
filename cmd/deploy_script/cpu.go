@@ -44,7 +44,7 @@ var (
 		Use:   "create",
 		Short: "create cpu instance",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Debugf("create cpu instance with config %v", cpuCreateCfg)
+			log.Debugf("create cpu instance with config %#+v", cpuCreateCfg)
 			cli := tcli.NewClient(cmd.Context(), clientCfg, tcli.ClientOptWithURL(APIURL))
 			resp, err := cli.CreateDeployment(cmd.Context(), &cpuCreateCfg)
 			if err != nil {

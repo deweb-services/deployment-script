@@ -57,7 +57,7 @@ func init() {
 	cpuCreateCmd.Flags().IntVar(&cpuCreateCfg.Hdd, "disk_size", 10, "Disk size for your Deployment in GB")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.HddType, "disk_type", "hdd", "Disk type for your Deployment. Available options: hdd, ssd")
 	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ipv4, "assign_public_ipv4", false, "If true assigns a public ipv4 address for your Deployment")
-	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ipv4, "assign_public_ipv6", false, "If true assigns a public ipv6 address for your Deployment")
+	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ipv6, "assign_public_ipv6", false, "If true assigns a public ipv6 address for your Deployment")
 	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ygg, "assign_ygg_ip", false, "If true assigns a yggdrasil address for your Deployment")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.NetworkUUID, "vpc_id", "", "ID of the vpc to deploy your VM into")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.SSHKey, "ssh_key", "", "SSH key to add to the target VM to make it possible to connect to your VM")
