@@ -61,6 +61,7 @@ func init() {
 	cpuCreateCmd.Flags().BoolVar(&cpuCreateCfg.Ygg, "assign_ygg_ip", false, "If true assigns a yggdrasil address for your Deployment")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.NetworkUUID, "vpc_id", "", "ID of the vpc to deploy your VM into")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.SSHKey, "ssh_key", "", "SSH key to add to the target VM to make it possible to connect to your VM")
+	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.SSHKeyName, "ssh_key_name", "", "SSH key name")
 	cpuCreateCmd.Flags().StringVar(&cpuCreateCfg.HostName, "host_name", "", "Host name for your Deployment")
 	_ = viper.BindPFlag("region", rootCmd.Flags().Lookup("region"))
 	_ = viper.BindPFlag("image", rootCmd.Flags().Lookup("image"))
@@ -73,6 +74,7 @@ func init() {
 	_ = viper.BindPFlag("assign_ygg_ip", rootCmd.Flags().Lookup("assign_ygg_ip"))
 	_ = viper.BindPFlag("vpc_id", rootCmd.Flags().Lookup("vpc_id"))
 	_ = viper.BindPFlag("ssh_key", rootCmd.Flags().Lookup("ssh_key"))
+	_ = viper.BindPFlag("ssh_key_name", rootCmd.Flags().Lookup("ssh_key_name"))
 	_ = viper.BindPFlag("host_name", rootCmd.Flags().Lookup("host_name"))
 	cpuCmd.AddCommand(cpuCreateCmd)
 
