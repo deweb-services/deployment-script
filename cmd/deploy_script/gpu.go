@@ -46,7 +46,7 @@ var (
 		Use:   "create",
 		Short: "create gpu instance",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Debugf("create gpu instance with config %v", gpuCreateCfg)
+			log.Debugf("create gpu instance with config %#+v", gpuCreateCfg)
 			cli := tcli.NewClient(cmd.Context(), clientCfg, tcli.ClientOptWithURL(APIURL))
 			respCreate, err := cli.CreateGPU(cmd.Context(), &gpuCreateCfg)
 			if err != nil {
