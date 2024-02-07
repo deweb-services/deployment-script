@@ -73,7 +73,7 @@ func init() {
 	_ = viper.BindPFlag("assign_ygg_ip", cpuCreateCmd.Flags().Lookup("assign_ygg_ip"))
 	_ = viper.BindPFlag("vpc_id", cpuCreateCmd.Flags().Lookup("vpc_id"))
 	_ = viper.BindPFlag("ssh_key", cpuCreateCmd.Flags().Lookup("ssh_key"))
-  _ = viper.BindPFlag("ssh_key_name", cpuCreateCmd.Flags().Lookup("ssh_key_name"))
+	_ = viper.BindPFlag("ssh_key_name", cpuCreateCmd.Flags().Lookup("ssh_key_name"))
 	_ = viper.BindPFlag("host_name", cpuCreateCmd.Flags().Lookup("host_name"))
 	cpuCmd.AddCommand(cpuCreateCmd)
 
