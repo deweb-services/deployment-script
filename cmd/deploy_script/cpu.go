@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	tcli "github.com/deweb-services/terraform-provider-dws/dws/provider/client"
+	tcli "github.com/deweb-services/terraform-provider-nodeshift/nodeshift/provider/client"
 	"github.com/spf13/cobra"
 )
 
