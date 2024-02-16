@@ -3,7 +3,7 @@ module github.com/deweb-services/deployment-script
 go 1.21.3
 
 require (
-	github.com/deweb-services/terraform-provider-dws v0.0.11
+	github.com/deweb-services/terraform-provider-nodeshift v0.0.14
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
 	go.uber.org/zap v1.26.0
